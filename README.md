@@ -46,4 +46,9 @@ curl --location 'http://host.docker.internal:8080/links' \
 --header 'Authorization: Bearer [token]'
 ```
 
+### Kubernetes Deployment
+[Helm](https://helm.sh/) is recommended to use to deploy and run the application on a Kubernetes cluster. 
+You should concretely see a set of manifest files in directory charts/shortener-service to work with Helm for the deployment.
+
+
 

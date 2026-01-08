@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-{{ .Values.application.name }}-configmap"
+  namespace: "{{ .Release.Namespace}}"
+data:
+  PORT: "8080"
+  ISSUER_URI: "http://{{ .Values.application.oidc.name }}.{{ .Release.Namespace}}.svc.cluster.local:8080/{{ .Values.application.oidc.realmPath }}"
+  CLIENT_ID: "{{ .Values.application.clientId }}"
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: "org.postgresql.Driver"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://{{ .Values.application.database.instance }}:{{ .Values.application.database.port }}/{{ .Values.application.database.name }}"
+  SPRING_DATASOURCE_USERNAME: "{{ .Values.application.database.username }}"
+  SPRING_DATASOURCE_PASSWORD: "{{ .Values.application.database.password }}"
+  RABBITMQ_HOST: "{{ .Values.application.messaging.host }}"
+  RABBITMQ_PORT: "{{ .Values.application.messaging.port }}"
+  RABBITMQ_USERNAME: "{{ .Values.application.messaging.username }}"
+  RABBITMQ_PASSWORD: "{{ .Values.application.messaging.password }}"
+  SHORTENER_DOMAIN: "{{ .Values.application.public.domain }}"

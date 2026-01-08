@@ -1,0 +1,32 @@
+application:
+  name: shortener-service
+  public:
+    domain: http://host.docker.internal:8080/c
+  oidc:
+    name: keycloak
+    realmPath:
+  clientId: master-realm
+  database:
+    instance: rds-postgres
+    port: 5432
+    name: shortener
+    username: shortener
+    password: shortener
+  messaging:
+    hostname: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+image:
+  name: duongbq83/shortener-service
+  tag: latest
+  imagePullSecrets: []
+replicas: 1
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi

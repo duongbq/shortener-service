@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-{{ .Values.application.name }}-deployment"
+  namespace: "{{ .Release.Namespace}}"
+spec:
+  replicas: "{{ .Values.replicas }}"
+  progressDeadlineSeconds: 120
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-{{ .Values.application.name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-{{ .Values.application.name }}"
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: "{{ .Release.Name }}-{{ .Values.application.name }}"
+          image: "{{ .Values.image.name }}:{{ .Chart.Version | default .Values.image.tag}}"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: "{{ .Release.Name }}-{{ .Values.application.name }}-configmap"
+          resources:
+            requests:
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
+          ports:
+            - containerPort: 8080
+              name: "{{ .Release.Name }}-{{ .Values.application.name }}"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 300
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080

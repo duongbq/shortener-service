@@ -50,6 +50,7 @@ dependencies {
     testImplementation 'com.h2database:h2:2.4.240'
     testImplementation 'org.jmolecules.integrations:jmolecules-starter-test:0.32.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

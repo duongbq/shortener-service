@@ -74,7 +74,7 @@ services:
   shortener-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     restart: no
     environment:
       ISSUER_URI: http://keycloak:8080/realms/master

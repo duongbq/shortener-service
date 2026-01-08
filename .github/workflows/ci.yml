@@ -32,8 +32,8 @@ jobs:                                            # Define all the jobs in this w
       - name: Make gradlew executable            # Ensure the wrapper is runnable
         run: chmod +x gradlew                   # – Grant execute permissions
 
-      - name: Build with Gradle                  # Compile & assemble the project
-        run: ./gradlew build --no-daemon        # – Run Gradle build without daemon
+#      - name: Build with Gradle                  # Compile & assemble the project
+#        run: ./gradlew build --no-daemon        # – Run Gradle build without daemon
 
       - name: Run Tests                          # Execute unit tests
         run: ./gradlew test --no-daemon         # – Run tests without starting a daemon
@@ -56,7 +56,7 @@ jobs:                                            # Define all the jobs in this w
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: ./gradlew bootJar --no-daemon
 
       - name: Dockerize & Push Docker Image      # Build & push Docker image to registry
         uses: mr-smithers-excellent/docker-build-push@v6

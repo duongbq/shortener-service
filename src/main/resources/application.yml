@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: URL Shortener Application
+  main:
+    keep-alive: true
+    web-application-type: reactive
+  web:
+    resources:
+      add-mappings: false
+  reactor:
+    context-propagation: auto
+  threads:
+    virtual:
+      enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI:http://host.docker.internal:1111/realms/master}
+      client:
+        registration:
+          master-realm:
+            client-id: ${CLIENT_ID:master-realm}
+  datasource:
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER-CLASS-NAME:org.postgresql.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://host.docker.internal:5432/shortener}
+    username: ${SPRING_DATASOURCE_USERNAME:shortener}
+    password: ${SPRING_DATASOURCE_PASSWORD:shortener}
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        transaction:
+          jta:
+            platform: org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform
+  rabbitmq:
+    host: ${RABBITMQ_HOST:host.docker.internal}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        prefetch: ${RABBITMQ_CONSUMER_PREFETCH:5} # Limit the number of messages sent to the consumer at once
+        concurrency: ${RABBITMQ_CONSUMER_CONCURRENCY:3}
+        max-concurrency: ${RABBITMQ_CONSUMER_MAX_CONCURRENCY:15} # Control the number of concurrent consumers
+
+shortener:
+  domain: ${SHORTENER_DOMAIN:http://host.docker.internal:8080/c}

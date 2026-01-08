@@ -1,0 +1,115 @@
+services:
+  # KEYCLOAK
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    restart: unless-stopped
+    environment:
+      DEBUG: 'true'
+      KC_PROXY: none #forwarded edge
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: info
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev #--import-realm
+    ports:
+      - "1111:8080"
+    depends_on:
+      - keycloak-db
+    networks:
+      - backend
+ 
+  # KEYCLOAK DB
+  keycloak-db:
+    image: postgres:18-alpine #latest
+    container_name: keycloak-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5431:5432"
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql
+    networks:
+      - backend
+        
+  shortener-db:
+    image: postgres:18-alpine #latest
+    container_name: shortener-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shortener
+      POSTGRES_USER: shortener
+      POSTGRES_PASSWORD: shortener
+    ports:
+      - "5432:5432"
+    volumes:
+      - shortener-db-data:/var/lib/postgresql
+    networks:
+      - backend
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.11-management
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      # Mount the container's data and log directories to named volumes
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq/
+    networks:
+      - backend
+
+  shortener-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: no
+    environment:
+      ISSUER_URI: http://keycloak:8080/realms/master
+      CLIENT_ID: master-realm
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/shortener
+      SPRING_DATASOURCE_USERNAME: shortener
+      SPRING_DATASOURCE_PASSWORD: shortener
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+      SHORTENER_DOMAIN: http://host.docker.internal:8080/c
+    links:
+      - shortener-db:db
+      - rabbitmq:rabbitmq
+      - keycloak:keycloak
+    depends_on:
+      - shortener-db
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+volumes:
+  keycloak-db-data:
+    driver: local
+  shortener-db-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
+  rabbitmq-log:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
+

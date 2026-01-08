@@ -27,10 +27,10 @@ spring:
           master-realm:
             client-id: ${CLIENT_ID:master-realm}
   datasource:
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER-CLASS-NAME:org.postgresql.Driver}
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://host.docker.internal:5432/shortener}
-    username: ${SPRING_DATASOURCE_USERNAME:shortener}
-    password: ${SPRING_DATASOURCE_PASSWORD:shortener}
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
     hikari:
       maximum-pool-size: 10
   jpa:
